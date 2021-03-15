@@ -1,31 +1,13 @@
-# Prerequisites
-*.d
-.cache.mk
-
-# Object files
-*.o
-*.ko
-*.elf
-
-# Linker output
-*.map
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.a
-
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
+.fibdrv.ko.cmd
+.fibdrv.mod.cmd
+.fibdrv.mod.o.cmd
+.fibdrv.o.cmd
 Module.symvers
-Mkfile.old
-dkms.conf
-
-# test-oriented
 client
+fibdrv.ko
+fibdrv.mod
+fibdrv.mod.c
+fibdrv.mod.o
+fibdrv.o
+modules.order
 out
