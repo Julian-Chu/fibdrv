@@ -50,7 +50,7 @@ check: all
 check-plot: all-plot
 	$(MAKE) unload
 	$(MAKE) load
-	sudo ./client-plot > out_plot
+	sudo taskset -c 0 ./client-plot > out_plot
 	$(MAKE) unload
 	gnuplot ./scripts/plot.gp
 	display plot_output.png
