@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>  // Needed for mlockall()
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
@@ -22,14 +23,27 @@ int main()
         exit(1);
     }
 
+    /* Now lock all current and future pages
+       from preventing of being paged */
+    if (mlockall(MCL_CURRENT | MCL_FUTURE))
+        printf("mlockall failed:");
+
     for (int i = 0; i <= offset; i++) {
         lseek(fd, i, SEEK_SET);
+        clock_gettime(CLOCK_MONOTONIC, &t_start);
+        write(fd, write_buf, 2);
+        clock_gettime(CLOCK_MONOTONIC, &t_end);
+    }
+
+    for (int i = 0; i <= offset; i++) {
+        long long sz, kt, elapsed_time;
+        lseek(fd, i, SEEK_SET);
         clock_gettime(clk_id, &t_start);
-        long long sz = read(fd, buf, 1);
-        long long kt = write(fd, write_buf, strlen(write_buf));
+        sz = read(fd, buf, 1);
+        kt = write(fd, write_buf, strlen(write_buf));
         clock_gettime(clk_id, &t_end);
-        long long elapsed_time = (t_end.tv_sec * NANOSEC + t_end.tv_nsec) -
-                                 (t_start.tv_sec * NANOSEC + t_start.tv_nsec);
+        elapsed_time = (t_end.tv_sec * NANOSEC + t_end.tv_nsec) -
+                       (t_start.tv_sec * NANOSEC + t_start.tv_nsec);
         printf("%d %lld %lld %lld %lld\n", i, sz, kt, elapsed_time,
                elapsed_time - kt);
     }

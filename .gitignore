@@ -11,3 +11,6 @@ fibdrv.mod.o
 fibdrv.o
 modules.order
 out
+client-plot
+out_plot
+plot_output.png
