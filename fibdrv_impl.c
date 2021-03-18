@@ -24,88 +24,65 @@ static struct cdev *fib_cdev;
 static struct class *fib_class;
 static DEFINE_MUTEX(fib_mutex);
 
-static void __swap(char *a, char *b)
+#define BigN_carry 10000000000000000000
+
+typedef struct {
+    unsigned long long data[6]
+} BigN;
+
+void init_BigN(BigN *n)
 {
-    *a ^= *b;
-    *b ^= *a;
-    *a ^= *b;
+    int data_size = sizeof(n->data) / sizeof(n->data[0]);
+    for (int i = 0; i < data_size; i++) {
+        n->data[i] = 0;
+    }
 }
 
-static void reverse(char *str, size_t n)
+void BigN_add(BigN *a, BigN *b, BigN *res)
 {
-    for (int i = 0; i < (n >> 1); i++)
-        __swap(&str[i], &str[n - i - 1]);
+    int data_size = sizeof(res->data) / sizeof(res->data[0]);
+    long long carry = 0;
+    for (int i = 0; i < data_size; i++) {
+        if (a->data[i] + carry > BigN_carry - b->data[i]) {
+            res->data[i] = (a->data[i] - BigN_carry) + b->data[i] + carry;
+            carry = 1;
+        } else {
+            res->data[i] = a->data[i] + b->data[i] + carry;
+            carry = 0;
+        }
+    }
 }
 
-static void string_number_add(xs *a, xs *b, xs *out)
+BigN fib_sequence(long long k)
 {
-    char *data_a, *data_b;
-    size_t size_a, size_b;
-    int i, carry = 0;
-    int sum;
+    /* FIXME: use clz/ctz and fast algorithms to speed up */
+    BigN f[k + 2];
 
-    if (xs_size(a) < xs_size(b)) {
-        xs tmp = *a;
-        *a = *b;
-        *b = tmp;
+    init_BigN(&f[0]);
+    f[0].data[0] = 0;
+    init_BigN(&f[1]);
+    f[1].data[0] = 1;
+
+    for (int i = 2; i <= k; i++) {
+        init_BigN(&f[i]);
+        BigN_add(&f[i - 2], &f[i - 1], &f[i]);
     }
 
-    data_a = xs_data(a);
-    data_b = xs_data(b);
-
-    size_a = xs_size(a);
-    size_b = xs_size(b);
-
-    reverse(data_a, size_a);
-    reverse(data_b, size_b);
-
-    char buf[size_a + 2];
-
-    for (i = 0; i < size_b; i++) {
-        sum = (data_a[i] - '0') + (data_b[i] - '0') + carry;
-        buf[i] = '0' + sum % 10;
-        carry = sum / 10;
-    }
-
-    for (i = size_b; i < size_a; i++) {
-        sum = (data_a[i] - '0') + carry;
-        buf[i] = '0' + sum % 10;
-        carry = sum / 10;
-    }
-
-    if (carry)
-        buf[i++] = '0' + carry;
-
-    buf[i] = 0;
-
-    reverse(buf, i);
-
-    reverse(data_a, size_a);
-    reverse(data_b, size_b);
-
-    if (out)
-        *out = *xs_tmp(buf);
+    return f[k];
 }
 
-static int fib_sequence(long long k, char __user *buf)
+void BigN_to_str(BigN *n, char str[128])
 {
-    xs f[k + 2];
-    int i, n;
-
-    f[0] = *xs_tmp("0");
-    f[1] = *xs_tmp("1");
-
-    for (i = 2; i <= k; i++)
-        string_number_add(&f[i - 1], &f[i - 2], &f[i]);
-
-    n = xs_size(&f[k]);
-    if (copy_to_user(buf, xs_data(&f[k]), n))
-        return -EFAULT;
-
-    for (i = 0; i <= k; i++)
-        xs_free(&f[i]);
-
-    return n;
+    for (int i = 5; i >= 0; i--) {
+        if (n->data[i] == 0 && i != 0) {
+            continue;
+        }
+        char substr[32];
+        snprintf(substr, 32, "%llu", n->data[i]);
+        strcat(str, substr);
+        printk("substr: %s\n", substr);
+    }
+    printk("str: %s\n", str);
 }
 
 
@@ -134,10 +111,14 @@ static ssize_t fib_read(struct file *file,
                         loff_t *offset)
 {
     kt = ktime_get();
-    long long result = fib_sequence(*offset, user_buf);
+    BigN result = fib_sequence(*offset);
+    char str[128] = "";
+    BigN_to_str(&result, str);
+    printk("res: %s\n", str);
+    copy_to_user(user_buf, str, sizeof(str));
     kt = ktime_sub(ktime_get(), kt);
 
-    return result;
+    return 128;
 }
 
 /* write operation is skipped */

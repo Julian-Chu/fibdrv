@@ -11,7 +11,7 @@ int main()
 {
     long long sz;
 
-    char buf[256];
+    char buf[128] = "";
     char write_buf[] = "testing writing";
     int offset = 100; /* TODO: try test something bigger than the limit */
 

@@ -30,7 +30,7 @@ unload:
 	sudo rmmod $(TARGET_MODULE) || true >/dev/null
 
 client: client.c
-	$(CC) -o $@ $^
+	$(CC) -g -o $@ $^
 
 client-plot: client_plot.c
 	$(CC) -o $@ $^
