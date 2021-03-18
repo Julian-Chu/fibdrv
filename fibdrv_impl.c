@@ -80,9 +80,7 @@ void BigN_to_str(BigN *n, char str[128])
         char substr[32];
         snprintf(substr, 32, "%llu", n->data[i]);
         strcat(str, substr);
-        printk("substr: %s\n", substr);
     }
-    printk("str: %s\n", str);
 }
 
 

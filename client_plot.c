@@ -12,7 +12,7 @@
 
 int main()
 {
-    char buf[1];
+    char buf[256];
     char write_buf[] = "testing writing";
     int offset = 100; /* TODO: try test something bigger than the limit */
     struct timespec t_start, t_end;
@@ -31,7 +31,7 @@ int main()
     for (int i = 0; i <= offset; i++) {
         lseek(fd, i, SEEK_SET);
         clock_gettime(CLOCK_MONOTONIC, &t_start);
-        write(fd, write_buf, 2);
+        write(fd, write_buf, 256);
         clock_gettime(CLOCK_MONOTONIC, &t_end);
     }
 

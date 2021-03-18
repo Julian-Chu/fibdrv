@@ -55,4 +55,4 @@ check-plot: all-plot
 	sudo taskset -c 0 ./client-plot > out_plot
 	$(MAKE) unload
 	gnuplot ./scripts/plot.gp
-	display plot_output.png
+	eog plot_output.png
