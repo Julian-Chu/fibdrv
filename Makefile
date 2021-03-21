@@ -53,4 +53,11 @@ check-plot: all-plot
 	sudo taskset -c 0 ./client-plot > out_plot
 	$(MAKE) unload
 	gnuplot ./scripts/plot.gp
-	display plot_output.png
+	eog plot_output.png
+
+
+clz-test: 
+	$(CC) clz_test.c -O0 -o clz_test
+	sudo taskset -c 0 ./clz_test > out_plot_clz 
+	gnuplot ./scripts/plot_clz_test.gp
+	eog plot_clz_test.png

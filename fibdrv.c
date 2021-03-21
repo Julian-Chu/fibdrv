@@ -26,15 +26,15 @@ static DEFINE_MUTEX(fib_mutex);
 
 static long long fib_sequence(long long k)
 {
-    /* FIXME: use clz/ctz and fast algorithms to speed up */
-    long long msb = 0;
-    for (long long i = k; i; i >>= 1) {
-        msb++;
-    }
+    /* long long msb = 0; */
+    /* for(long long i = k; i; i>>=1){ */
+    /*     msb++; */
+    /* } */
+    long long msb = 64 - __builtin_clz(k);
 
     long long a = 0, b = 1;
 
-    for (long i = 1; i <= msb; i++) {
+    for (long long i = 1; i <= msb; i++) {
         long long f_2k = a * (2 * b - a);
         long long f_2k1 = a * a + b * b;
         if ((k >> (msb - i)) & 1) {
