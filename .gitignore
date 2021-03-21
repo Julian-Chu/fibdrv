@@ -1,16 +1,19 @@
-.fibdrv.ko.cmd
-.fibdrv.mod.cmd
-.fibdrv.mod.o.cmd
-.fibdrv.o.cmd
-Module.symvers
-client
-fibdrv.ko
-fibdrv.mod
-fibdrv.mod.c
-fibdrv.mod.o
-fibdrv.o
-modules.order
-out
-client-plot
-out_plot
-plot_output.png
+Removing .fibdrv.ko.cmd
+Removing .fibdrv.mod.cmd
+Removing .fibdrv.mod.o.cmd
+Removing .fibdrv.o.cmd
+Removing Module.symvers
+Removing a.out
+Removing client
+Removing client-plot
+Removing clz_test
+Removing fibdrv.ko
+Removing fibdrv.mod
+Removing fibdrv.mod.o
+Removing fibdrv.o
+Removing modules.order
+Removing out
+Removing out_plot
+Removing out_plot_clz
+Removing plot_clz_test.png
+Removing plot_output.png
