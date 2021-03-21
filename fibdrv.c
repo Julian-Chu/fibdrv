@@ -27,16 +27,27 @@ static DEFINE_MUTEX(fib_mutex);
 static long long fib_sequence(long long k)
 {
     /* FIXME: use clz/ctz and fast algorithms to speed up */
-    long long f[k + 2];
-
-    f[0] = 0;
-    f[1] = 1;
-
-    for (int i = 2; i <= k; i++) {
-        f[i] = f[i - 1] + f[i - 2];
+    long long msb = 0;
+    for (long long i = k; i; i >>= 1) {
+        msb++;
     }
 
-    return f[k];
+    long long a = 0, b = 1;
+
+    for (long i = 1; i <= msb; i++) {
+        long long f_2k = a * (2 * b - a);
+        long long f_2k1 = a * a + b * b;
+        if ((k >> (msb - i)) & 1) {
+            a = f_2k1;
+            b = f_2k + f_2k1;
+        } else {
+            a = f_2k;
+            b = f_2k1;
+        }
+    }
+
+
+    return a;
 }
 
 static int fib_open(struct inode *inode, struct file *file)
